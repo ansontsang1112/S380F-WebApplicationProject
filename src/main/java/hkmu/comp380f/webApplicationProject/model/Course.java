@@ -1,4 +1,4 @@
-package hkmu.comp380f.s380f_webapplicationproject.model;
+package hkmu.comp380f.webApplicationProject.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -7,16 +7,8 @@ public class Course implements Serializable {
     private String id;
     private String courseID; 
     private String courseName;
-    private ArrayList<String> lectures;
-    private ArrayList<String> studentList;
-    
-    public void addLectureToList(String lectureUserID) {
-        lectures.add(lectureUserID);
-    }
-    
-    public void addStudentToList(String studentUserID) {
-        studentList.add(studentUserID);
-    }
+    private String [] lectures;
+    private String [] studentList;
 
     public void setCourseID(String courseID) {
         this.courseID = courseID;
@@ -39,12 +31,23 @@ public class Course implements Serializable {
         return courseName;
     }
 
-    public ArrayList<String> getLectures() {
+    public String [] getLectures() {
         return lectures;
     }
 
-    public ArrayList<String> getStudentList() {
+    public String [] getStudentList() {
         return studentList;
     }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setLectures(String [] lectures) {
+        this.lectures = lectures;
+    }
+
+    public void setStudentList(String [] studentList) {
+        this.studentList = studentList;
+    }
 }

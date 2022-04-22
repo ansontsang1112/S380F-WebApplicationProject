@@ -1,6 +1,4 @@
-package hkmu.comp380f.s380f_webapplicationproject.model;
-
-import java.util.ArrayList;
+package hkmu.comp380f.webApplicationProject.model;
 
 public class User {
     private String uid;
@@ -9,9 +7,11 @@ public class User {
     private String fullName;
     private String phoneNumber;
     private String address;
-    private int role;
+    private String role;
 
-    public User(String uid, String username, String password, String fullName, String phoneNumber, String address, int role) {
+    public User() {}
+
+    public User(String uid, String username, String password, String fullName, String phoneNumber, String address, String role) {
         this.uid = uid;
         this.username = username;
         this.password = password;
@@ -21,14 +21,17 @@ public class User {
         this.role = role;
     }
 
-    public int getRole() {
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    public String getRole() {
         return role;
     }
 
-    public void setRole(int role) {
+    public void setRole(String role) {
         this.role = role;
     }
-    
     
     public void setUsername(String username) {
         this.username = username;
@@ -73,7 +76,4 @@ public class User {
     public String getAddress() {
         return address;
     }
-    
-    
-    
 }
