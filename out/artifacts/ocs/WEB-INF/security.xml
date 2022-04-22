@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<b:beans
+        xmlns:b="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.springframework.org/schema/security"
+
+
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+                      http://www.springframework.org/schema/beans/spring-beans.xsd
+                      http://www.springframework.org/schema/security
+                      http://www.springframework.org/schema/security/spring-security.xsd
+">
+    <b:bean id="authSuccessHandler" class="hkmu.comp380f.webApplicationProject.handler.CustomAuthenticationSuccessHandler"/>
+    <b:bean id="passwordEncoder" class="hkmu.comp380f.webApplicationProject.handler.CustomPasswordEncoderHandler" />
+    <b:bean id="userAuthServices" class="hkmu.comp380f.webApplicationProject.services.UserAuthServices"/>
+    <b:bean id="logoutSuccessHandler" class="hkmu.comp380f.webApplicationProject.handler.CustomLogoutSuccessHandler"/>
+
+    <http auto-config="true" use-expressions="true">
+        <intercept-url pattern="/student/**" access="hasAnyAuthority('USER', 'LECTURER')" />
+        <intercept-url pattern="/lecturer/**" access="hasAuthority('LECTURER')" />
+        <intercept-url pattern="/" access="permitAll()" />
+
+        <form-login login-page="/login"
+                    login-processing-url="/login"
+                    authentication-failure-url="/login?error"
+                    authentication-success-handler-ref="authSuccessHandler"
+        />
+
+        <logout logout-url="/logout"
+                invalidate-session="true"
+                delete-cookies="JSESSIONID"
+                success-handler-ref="logoutSuccessHandler"
+        />
+
+        <session-management invalid-session-url="/login"/>
+    </http>
+
+    <authentication-manager>
+        <authentication-provider user-service-ref="userAuthServices">
+            <password-encoder ref="passwordEncoder"/>
+        </authentication-provider>
+    </authentication-manager>
+</b:beans>

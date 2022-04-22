@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DdlMappings">
+    <mapping uuid="651c1fa3-3660-4072-981b-3cc3e5cebd22" name="s380fProject Mapping">
+      <data-sources db="5ea3b77f-faf3-4731-8921-66419c29af07" />
+      <scope>
+        <node negative="1">
+          <node kind="database" qname="@">
+            <node kind="schema" qname="@" />
+          </node>
+          <node kind="schema" qname="NBUSER" />
+        </node>
+      </scope>
+    </mapping>
+  </component>
+</project>
