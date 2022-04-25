@@ -14,6 +14,10 @@
     ">
 
     <context:component-scan base-package="hkmu.comp380f.webApplicationProject.controller" />
+    <context:component-scan base-package="hkmu.comp380f.webApplicationProject.component" />
+    <context:component-scan base-package="hkmu.comp380f.webApplicationProject.dao" />
+    <context:component-scan base-package="hkmu.comp380f.webApplicationProject.services" />
+
     <mvc:annotation-driven />
 
     <bean id="multipartResolver"     

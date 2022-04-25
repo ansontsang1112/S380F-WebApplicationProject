@@ -7,8 +7,6 @@ import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,7 +36,7 @@ public class UserRepositoryImpl implements UserRepository {
             HashMap<String, User> hashMap = new HashMap<>();
 
                 while (resultSet.next()) {
-                    String id = resultSet.getString("uid");
+                    String id = resultSet.getString("UID");
                     User user = hashMap.get(id);
                     if (user == null) {
                         user = new User();
@@ -66,9 +64,23 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     @Transactional(readOnly = true)
+    public List<User> queryRelatedUserByType(String role) {
+        final String statement = "SELECT * FROM REGISTER_USER WHERE role = ? ORDER BY username ASC";
+        return jdbcOperations.query(statement, new UserExtractor(), role);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<User> queryUser(String username) {
         final String statement = "SELECT * FROM REGISTER_USER WHERE username = ?";
         return jdbcOperations.query(statement, new UserExtractor(), username);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<User> queryUserByID(String id) {
+        final String statement = "SELECT * FROM REGISTER_USER WHERE uid = ?";
+        return jdbcOperations.query(statement, new UserExtractor(), id);
     }
 
     @Override
@@ -96,12 +108,29 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void delete(User user) {
-
+    public <T> void delete(T key) {
+        final String statement = "DELETE FROM REGISTER_USER WHERE uid = ?";
+        jdbcOperations.update(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                PreparedStatement preparedStatement = con.prepareStatement(statement);
+                preparedStatement.setString(1, key.toString());
+                return preparedStatement;
+            }
+        });
     }
 
     @Override
-    public <T> void update(User user, T fieldOld, T fieldNew) {
-
+    public <T> void update(T fieldOld, T fieldNew, T key) {
+        final String statement = "UPDATE REGISTER_USER SET " + fieldOld.toString() + " = ? WHERE uid = ?";
+        jdbcOperations.update(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                PreparedStatement preparedStatement = con.prepareStatement(statement);
+                preparedStatement.setString(1, fieldNew.toString());
+                preparedStatement.setString(2, key.toString());
+                return preparedStatement;
+            }
+        });
     }
 }

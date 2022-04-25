@@ -23,7 +23,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         } else if (roles.contains("LECTURER")) {
             response.sendRedirect("/ocs/lecturer");
         } else {
-            response.sendRedirect("/ocs/login");
+            response.sendRedirect("/ocs/denied");
         }
     }
 }
