@@ -20,6 +20,12 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/ocs/course">Course Page</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/ocs/comment">Comment Page</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/ocs/poll">Polling Page</a>
+                </li>
             </ul>
             &nbsp;
             <form class="d-flex" action="${pageContext.request.contextPath}/logout">
@@ -142,7 +148,7 @@
                         <c:forEach var="i" begin="0" end="${courseObjectByUser.size()-1}">
                             <tr>
                                 <td><h5>
-                                    <a href="/ocs/course"><span class="badge bg-success">${courseObjectByUser.get(i).courseID}</span></a>
+                                    <a href="/ocs/course?courseSelected=${courseObjectByUser.get(i).courseID}"><span class="badge bg-success">${courseObjectByUser.get(i).courseID}</span></a>
                                 </h5></td>
                                 <td>${courseObjectByUser.get(i).courseName}</td>
                                 <td>${courseObjectByUser.get(i).serializedLectures}</td>

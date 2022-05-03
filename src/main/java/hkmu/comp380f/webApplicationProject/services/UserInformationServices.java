@@ -29,12 +29,27 @@ public class UserInformationServices {
 
     public List<Course> courseList(Principal principal) {
         User userObject = userRepository.queryUser(principal.getName()).get(0);
-        List<Course> courseList = courseRepository.queryCoursesByStudent(userObject);
-        courseList = dataTransformerComponent.courseListModifier(courseList);
 
-        for(Course course : courseList) {
-            course.setSerializedLectures(dataTransformerComponent.serialization(course.getLectures()));
-            course.setSerializedStudents(dataTransformerComponent.serialization(course.getStudentList()));
+        List<Course> courseList;
+
+        if(userObject.getRole() == "USER") {
+            courseList = courseRepository.queryCoursesByStudent(userObject);
+            courseList = dataTransformerComponent.courseListModifier(courseList);
+
+            for(Course course : courseList) {
+                course.setSerializedLectures(dataTransformerComponent.serialization(course.getLectures()));
+                course.setSerializedStudents(dataTransformerComponent.serialization(course.getStudentList()));
+            }
+
+        } else {
+            courseList = courseRepository.queryCoursesByLecture(userObject);
+            courseList = dataTransformerComponent.courseListModifier(courseList);
+
+            for(Course course : courseList) {
+                course.setSerializedLectures(dataTransformerComponent.serialization(course.getLectures()));
+                course.setSerializedStudents(dataTransformerComponent.serialization(course.getStudentList()));
+            }
+
         }
 
         if(courseList.isEmpty()) {

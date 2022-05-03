@@ -24,6 +24,8 @@
         <intercept-url pattern="/student/**" access="hasAnyAuthority('USER', 'LECTURER')" />
         <intercept-url pattern="/lecturer/**" access="hasAuthority('LECTURER')" />
         <intercept-url pattern="/course/**" access="hasAnyAuthority('USER', 'LECTURER')" />
+        <intercept-url pattern="/comment/**" access="hasAnyAuthority('USER', 'LECTURER')" />
+        <intercept-url pattern="/poll/**" access="hasAnyAuthority('USER', 'LECTURER')" />
         <intercept-url pattern="/" access="permitAll()" />
 
         <form-login login-page="/login"

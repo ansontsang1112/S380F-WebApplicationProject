@@ -7,15 +7,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
+@Repository
 public class CommentRepositoryImpl implements CommentRepository {
     private JdbcOperations jdbcOperations;
 
@@ -37,7 +43,9 @@ public class CommentRepositoryImpl implements CommentRepository {
                     comment.setMessage_id(id);
                     comment.setUserID(resultSet.getString("user_id"));
                     comment.setMessage(resultSet.getString("message"));
+                    comment.setCourseID(resultSet.getString("course_id"));
                     comment.setTimestamp(resultSet.getTimestamp("timestamp"));
+                    comment.setLastEdit(resultSet.getTimestamp("lastedit"));
                     hashMap.put(id, comment);
                 }
             }
@@ -47,22 +55,41 @@ public class CommentRepositoryImpl implements CommentRepository {
 
     @Override
     public List<Comment> queryAllComment() {
-        return null;
+        final String statement = "SELECT * FROM COMMENT_REGISTRY";
+        return jdbcOperations.query(statement, new CommentExtractor());
     }
 
     @Override
     public List<Comment> queryCommentsByCourseId(String courseID) {
-        return null;
+        final String statement = "SELECT * FROM COMMENT_REGISTRY WHERE course_id = ?";
+        return jdbcOperations.query(statement, new CommentExtractor(), courseID);
     }
 
     @Override
-    public List<Comment> queryCommentsByStudent(User user) {
-        return null;
+    public List<Comment> queryCommentsByStudent(String username) {
+        final String statement = "SELECT * FROM COMMENT_REGISTRY WHERE user_id = ?";
+        return jdbcOperations.query(statement, new CommentExtractor(), username);
     }
 
     @Override
     public String add(Comment comment) {
-        return null;
+        final String statement = "INSERT INTO COMMENT_REGISTRY VALUES (?, ?, ?, ?, ?, ?)";
+
+        jdbcOperations.update(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                PreparedStatement preparedStatement = con.prepareStatement(statement);
+                preparedStatement.setString(1, comment.getMessage_id());
+                preparedStatement.setString(2, comment.getUserID());
+                preparedStatement.setString(3, comment.getMessage());
+                preparedStatement.setString(4, comment.getCourseID());
+                preparedStatement.setTimestamp(5, comment.getTimestamp());
+                preparedStatement.setTimestamp(6, comment.getLastEdit());
+                return preparedStatement;
+            }
+        });
+
+        return comment.getMessage_id();
     }
 
     @Override
@@ -72,6 +99,17 @@ public class CommentRepositoryImpl implements CommentRepository {
 
     @Override
     public <T> String delete(T key) {
-        return null;
+        final String statement = "DELETE FROM COMMENT_REGISTRY WHERE message_id = ?";
+
+        jdbcOperations.update(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                PreparedStatement preparedStatement = con.prepareStatement(statement);
+                preparedStatement.setString(1, key.toString());
+                return preparedStatement;
+            }
+        });
+
+        return key.toString();
     }
 }

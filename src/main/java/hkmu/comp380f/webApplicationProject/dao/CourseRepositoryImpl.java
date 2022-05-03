@@ -74,12 +74,13 @@ public class CourseRepositoryImpl implements CourseRepository {
     }
 
     @Override
+    @Transactional
     public List<Course> queryCoursesByLecture(User lecture) {
         final String statement = "SELECT * FROM COURSE_REGISTRY";
         List<Course> courseList = new ArrayList<>();
         List<Course> allCourse  = jdbcOperations.query(statement, new CourseExtractor());
         for (Course course : allCourse) {
-            if(Arrays.asList(course.getStudentList()).contains(lecture.getUsername())) {
+            if(Arrays.asList(course.getLectures()).contains(lecture.getUsername())) {
                 courseList.add(course);
             }
         }

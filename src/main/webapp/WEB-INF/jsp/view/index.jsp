@@ -28,6 +28,12 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/ocs/course">Course Page</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/ocs/comment">Comment Page</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/ocs/poll">Polling Page</a>
+                    </li>
                 </ul>
                 &nbsp;
                 <form class="d-flex" action="${pageContext.request.contextPath}/logout">
@@ -51,6 +57,12 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/ocs/course">Course Page</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/ocs/comment">Comment Page</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/ocs/poll">Polling Page</a>
                     </li>
                 </ul>
                 &nbsp;

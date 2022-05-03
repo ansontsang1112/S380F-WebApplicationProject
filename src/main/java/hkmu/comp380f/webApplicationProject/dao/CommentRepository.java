@@ -8,7 +8,7 @@ import java.util.List;
 public interface CommentRepository {
     public List<Comment> queryAllComment();
     public List<Comment> queryCommentsByCourseId(String courseID);
-    public List<Comment> queryCommentsByStudent(User user);
+    public List<Comment> queryCommentsByStudent(String username);
 
     public String add(Comment comment);
     public <T> String update(T fieldOld, T fieldNew, T key);
