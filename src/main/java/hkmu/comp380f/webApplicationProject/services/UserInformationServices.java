@@ -32,7 +32,7 @@ public class UserInformationServices {
 
         List<Course> courseList;
 
-        if(userObject.getRole() == "USER") {
+        if("USER".equals(userObject.getRole())) {
             courseList = courseRepository.queryCoursesByStudent(userObject);
             courseList = dataTransformerComponent.courseListModifier(courseList);
 

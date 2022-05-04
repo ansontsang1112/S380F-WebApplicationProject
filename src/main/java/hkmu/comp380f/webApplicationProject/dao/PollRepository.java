@@ -13,8 +13,13 @@ public interface PollRepository {
 
     public Map<String, Integer> queryPollCountByQuestion(String Question);
     public List<PollResult> queryPollResultByUser(String username);
+    public List<PollResult> queryPollResultByPollID(String pollID);
+    public Map<String, ?> isUserVoteQuestionBefore(String username, String id);
 
     public void addPoll(Poll poll);
-    public <T> String delPollQuestion(T str);
-    public <T, V, K> String updatePollQuestion(T index, V newValue, K key);
+    public String delPoll(String str);
+    public <T, V, K> String updatePoll(T index, V newValue, K key);
+
+    public <T, V, K> void addPollResult(T userID, V pollID, K choice);
+    public <T, V, K> String updatePollResult(T index, V newValue, K key);
 }

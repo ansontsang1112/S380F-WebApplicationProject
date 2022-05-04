@@ -7,8 +7,17 @@ public class Poll {
     private String choice2;
     private String choice3;
     private String choice4;
+    private String pollID;
 
     public Poll() {}
+
+    public String getPollID() {
+        return pollID;
+    }
+
+    public void setPollID(String pollID) {
+        this.pollID = pollID;
+    }
 
     public String getUid() {
         return uid;
