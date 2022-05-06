@@ -1,8 +1,8 @@
 package hkmu.comp380f.webApplicationProject.dao;
 
 import hkmu.comp380f.webApplicationProject.model.Course;
+import hkmu.comp380f.webApplicationProject.model.CourseFile;
 import hkmu.comp380f.webApplicationProject.model.User;
-import hkmu.comp380f.webApplicationProject.component.DataTransformerComponent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
@@ -45,6 +45,29 @@ public class CourseRepositoryImpl implements CourseRepository {
                     course.setLectures(resultSet.getString("lectures").split(", "));
                     course.setStudentList(resultSet.getString("student_list").split(", "));
                     hashMap.put(id, course);
+                }
+            }
+
+            return new ArrayList<>(hashMap.values());
+        }
+    }
+
+    public static final class CourseFileExtractor implements ResultSetExtractor<List<CourseFile>> {
+        @Override
+        public List<CourseFile> extractData(ResultSet resultSet) throws SQLException, DataAccessException {
+            HashMap<String, CourseFile> hashMap = new HashMap<>();
+            while (resultSet.next()) {
+                String id = resultSet.getString("uid");
+                CourseFile courseFile = hashMap.get(id);
+                if (courseFile == null) {
+                    courseFile = new CourseFile();
+                    courseFile.setUid(id);
+                    courseFile.setCourseID(resultSet.getString("course_id"));
+                    courseFile.setFileType(resultSet.getString("file_type"));
+                    courseFile.setDisplay(resultSet.getBoolean("display"));
+                    courseFile.setTimestamp(resultSet.getTimestamp("timestamp"));
+                    courseFile.setSaveURL(resultSet.getString("url"));
+                    hashMap.put(id, courseFile);
                 }
             }
 
@@ -99,6 +122,36 @@ public class CourseRepositoryImpl implements CourseRepository {
             }
         }
         return courseList;
+    }
+
+    @Override
+    public <I> List<CourseFile> queryCourseFileByCourseID(I courseID) {
+        final String statement = "SELECT * FROM course_file_registry WHERE course_id = ?";
+        return jdbcOperations.query(statement, new CourseFileExtractor(), courseID);
+    }
+
+    @Override
+    public void addFile(CourseFile courseFile) {
+        final String statement = "INSERT INTO COURSE_FILE_REGISTRY VALUES (?, ?, ?, ?, ?, ?)";
+
+        jdbcOperations.update(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                PreparedStatement preparedStatement = con.prepareStatement(statement);
+                preparedStatement.setString(1, courseFile.getUid());
+                preparedStatement.setString(2, courseFile.getCourseID());
+                preparedStatement.setString(3, courseFile.getFileType());
+                preparedStatement.setString(4, courseFile.getSaveURL());
+                preparedStatement.setTimestamp(5, courseFile.getTimestamp());
+                preparedStatement.setBoolean(6, courseFile.isDisplay());
+                return preparedStatement;
+            }
+        });
+    }
+
+    @Override
+    public <I> void delFile(I fileID) {
+
     }
 
     @Override

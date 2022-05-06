@@ -11,6 +11,7 @@
     <title>Online Course System | Polling Page</title>
 
     <link href="https://cdn.hypernology.com/bootstrap5.0/bootstrap.min.css" rel="stylesheet">
+    <script src="https://i-cdn.hypernology.com/memberPortal/plugins/chart.js/Chart.min.js"></script>
 </head>
 <body>
 
@@ -36,7 +37,7 @@
                         <a class="nav-link" href="/ocs/course">Course Page</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/ocs/comment">Comment Page</a>
+                        <a class="nav-link" href="/ocs/comment">History</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/ocs/poll">Polling Page</a>
@@ -66,7 +67,7 @@
                         <a class="nav-link" href="/ocs/course">Course Page</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/ocs/comment">Comment Page</a>
+                        <a class="nav-link" href="/ocs/comment">History</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/ocs/poll">Polling Page</a>
@@ -117,6 +118,43 @@
                         <c:when test="${id != null}">
                             <p>Voting States</p>
                             <hr/>
+                            <canvas id="voteChart" width="64px" height="15%"></canvas>
+                            <script>
+                                const labels = [
+                                    '${requestedPoll.choice1}',
+                                    '${requestedPoll.choice2}',
+                                    '${requestedPoll.choice3}',
+                                    '${requestedPoll.choice4}'
+                                ];
+
+                                const data = {
+                                    labels: labels,
+                                    datasets: [{
+                                        label: '${requestedPoll.question}',
+                                        backgroundColor: 'rgb(51, 255, 255)',
+                                        borderColor: 'rgb(5, 249, 255)',
+                                        data: [
+                                            ${qrc.get("choice1")},
+                                            ${qrc.get("choice2")},
+                                            ${qrc.get("choice3")},
+                                            ${qrc.get("choice4")}
+                                        ],
+                                    }]
+                                };
+
+                                const config = {
+                                    type: 'bar',
+                                    data: data,
+                                    options: {
+                                        responsive: true
+                                    },
+                                };
+
+                                const myChart = new Chart(
+                                    document.getElementById('voteChart'),
+                                    config
+                                );
+                            </script>
                         </c:when>
                         <c:otherwise>
                             <p style="color:dodgerblue"><strong>No Poll Question Selected</strong></p>
@@ -149,7 +187,6 @@
                                                             </label>
                                                         </c:when>
                                                         <c:otherwise>
-                                                            ${pollChooseBefore}
                                                             <input class="form-check-input" type="radio" name="choice" value="${i+1}" id="${i+1}">
                                                             <label class="form-check-label" for="${i+1}">
                                                                     ${pollChoices.get(i)}
@@ -159,7 +196,8 @@
                                                 </div>
                                             </c:forEach>
                                                 <input type="hidden" id="id" name="id" value="${param.id}">
-                                                <input type="hidden" id="isVoteBefore" name="isVoteBefore" value="true">
+                                                <input type="hidden" id="update" name="update" value="true">
+                                                <input type="hidden" id="polledUID" name="polledUID" value="${polledUID}">
                                                 <button type="submit" class="btn btn-primary">Update the poll</button>
                                             </form:form>
                                         </div>
@@ -176,7 +214,7 @@
                                                     </div>
                                                 </c:forEach>
                                                 <input type="hidden" id="id" name="id" value="${param.id}">
-                                                <input type="hidden" id="isVoteBefore" name="isVoteBefore" value="false">
+                                                <input type="hidden" id="update" name="update" value="false">
                                             </div>
                                             <button type="submit" class="btn btn-primary">Submit the poll</button>
                                         </form:form>

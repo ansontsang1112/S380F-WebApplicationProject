@@ -21,13 +21,17 @@
         <access-denied-handler ref="deniedAccessHandler"/>
         <remember-me use-secure-cookie="true" />
 
-        <intercept-url pattern="/student/**" access="hasAnyAuthority('USER', 'LECTURER')" />
+        <intercept-url pattern="/student/**" access="hasAnyAuthority('USER')" />
         <intercept-url pattern="/lecturer/**" access="hasAuthority('LECTURER')" />
         <intercept-url pattern="/course/**" access="hasAnyAuthority('USER', 'LECTURER')" />
         <intercept-url pattern="/comment/**" access="hasAnyAuthority('USER', 'LECTURER')" />
         <intercept-url pattern="/poll/**" access="hasAnyAuthority('USER', 'LECTURER')" />
         <intercept-url pattern="/ocs/**" access="hasAnyAuthority('USER', 'LECTURER')" />
+        <intercept-url pattern="/upload" access="hasAuthority('LECTURER')" />
+        <intercept-url pattern="/download/**" access="hasAnyAuthority('USER', 'LECTURER')" />
         <intercept-url pattern="/" access="permitAll()" />
+
+        <csrf disabled="true" />
 
         <form-login login-page="/login"
                     login-processing-url="/login"

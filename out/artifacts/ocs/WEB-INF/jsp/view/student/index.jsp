@@ -21,7 +21,7 @@
                     <a class="nav-link" href="/ocs/course">Course Page</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/ocs/comment">Comment Page</a>
+                    <a class="nav-link" href="/ocs/comment">History</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/ocs/poll">Polling Page</a>

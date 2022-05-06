@@ -30,6 +30,13 @@
         <b:property name="dataSource" ref="dataSource" />
     </b:bean>
 
+    <b:bean id="httpServletRequest" class="org.springframework.web.context.support.HttpRequestHandlerServlet"/>
+
+    <b:bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <b:property name="maxUploadSize" value="268435678" />
+        <b:property name="uploadTempDir" value="TMP" />
+    </b:bean>
+
     <tx:annotation-driven transaction-manager="transactionManager" />
 
     <context:component-scan base-package="hkmu.comp380f.webApplicationProject.dao"/>

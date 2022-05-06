@@ -8,7 +8,7 @@
 
 
 <head>
-    <title>Online Course System | Comment Page</title>
+    <title>Online Course System | History</title>
 
     <link href="https://cdn.hypernology.com/bootstrap5.0/bootstrap.min.css" rel="stylesheet">
 </head>
@@ -36,7 +36,7 @@
                         <a class="nav-link" href="/ocs/course">Course Page</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/ocs/comment">Comment Page</a>
+                        <a class="nav-link" href="/ocs/comment">History</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/ocs/poll">Polling Page</a>
@@ -66,7 +66,7 @@
                         <a class="nav-link" href="/ocs/course">Course Page</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/ocs/comment">Comment Page</a>
+                        <a class="nav-link" href="/ocs/comment">History</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/ocs/poll">Polling Page</a>
@@ -83,55 +83,77 @@
 </div>
 
 <div class="container">
-    <c:if test="${action}">
-        <div class="alert alert-success" role="alert">
-            ${action}
-        </div>
-    </c:if>
-    <table class="table">
-        <thead>
-        <tr>
-            <th scope="col">Message</th>
-            <th scope="col">Course ID</th>
-            <th scope="col">Sent Time</th>
-            <c:if test="${role != 'USER'}">
-                <th scope="col">Action</th>
-            </c:if>
-        </tr>
-        </thead>
-        <tbody>
-        <c:choose>
-            <c:when test="${comments.size() != 0}">
+
+    <div class="card">
+        <div class="card-body">
+            <h4><strong>Message History</strong></h4>
+            <hr />
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">Message</th>
+                    <th scope="col">Course ID</th>
+                    <th scope="col">Sent Time</th>
+                    <th scope="col">Message Deleted?</th>
+                </tr>
+                </thead>
+                <tbody>
                 <c:choose>
-                    <c:when test="${role == 'USER'}">
+                    <c:when test="${comments.size() != 0}">
                         <c:forEach var="i" begin="0" end="${comments.size()-1}">
                             <tr>
                                 <td>${comments.get(i).message}</td>
                                 <td>${comments.get(i).courseID}</td>
                                 <td>${comments.get(i).timestamp}</td>
+                                <td>${comments.get(i).deleted}</td>
                             </tr>
                         </c:forEach>
                     </c:when>
                     <c:otherwise>
-                        <c:forEach var="i" begin="0" end="${comments.size()-1}">
-                            <tr>
-                                <td>${comments.get(i).message}</td>
-                                <td>${comments.get(i).courseID}</td>
-                                <td>${comments.get(i).timestamp}</td>
-                                <td><a href="?action=delete&mid=${comments.get(i).message_id}"><button type="button" class="btn btn-danger">Remove Comment</button></a></td>
-                            </tr>
-                        </c:forEach>
+                        <tr>
+                            <td colspan="2">No Comment(s) Found</td>
+                        </tr>
                     </c:otherwise>
                 </c:choose>
-            </c:when>
-            <c:otherwise>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <br />
+    <div class="card">
+        <div class="card-body">
+            <h4><strong>Poll History</strong></h4>
+            <hr />
+            <table class="table">
+                <thead>
                 <tr>
-                    <td colspan="2">No Comment(s) Found</td>
+                    <th scope="col">Poll ID</th>
+                    <th scope="col">Choice</th>
+                    <th scope="col">Sent Time</th>
                 </tr>
-            </c:otherwise>
-        </c:choose>
-        </tbody>
-    </table>
+                </thead>
+                <tbody>
+                <c:choose>
+                    <c:when test="${polls.size() != 0}">
+                        <c:forEach var="i" begin="0" end="${polls.size()-1}">
+                            <tr>
+                                <td>${polls.get(i).get(0)}</td>
+                                <td>${polls.get(i).get(1)}</td>
+                                <td>${polls.get(i).get(2)}</td>
+                            </tr>
+                        </c:forEach>
+                    </c:when>
+                    <c:otherwise>
+                        <tr>
+                            <td colspan="2">No Poll(s) Found</td>
+                        </tr>
+                    </c:otherwise>
+                </c:choose>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
 </div>
 
 </body>

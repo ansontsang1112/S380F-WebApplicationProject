@@ -46,6 +46,7 @@ public class CommentRepositoryImpl implements CommentRepository {
                     comment.setCourseID(resultSet.getString("course_id"));
                     comment.setTimestamp(resultSet.getTimestamp("timestamp"));
                     comment.setLastEdit(resultSet.getTimestamp("lastedit"));
+                    comment.setDeleted(resultSet.getBoolean("deleted"));
                     hashMap.put(id, comment);
                 }
             }
@@ -54,26 +55,39 @@ public class CommentRepositoryImpl implements CommentRepository {
     }
 
     @Override
-    public List<Comment> queryAllComment() {
-        final String statement = "SELECT * FROM COMMENT_REGISTRY";
+    public List<Comment> queryAllComment(boolean withDeleted) {
+        String statement;
+        if(withDeleted) {
+            statement = "SELECT * FROM COMMENT_REGISTRY ORDER BY timestamp DESC";
+        } else {
+            statement = "SELECT * FROM COMMENT_REGISTRY WHERE deleted = false ORDER BY timestamp DESC ";
+        }
+
         return jdbcOperations.query(statement, new CommentExtractor());
     }
 
     @Override
-    public List<Comment> queryCommentsByCourseId(String courseID) {
-        final String statement = "SELECT * FROM COMMENT_REGISTRY WHERE course_id = ?";
+    public List<Comment> queryCommentsByCourseId(String courseID, boolean withDeleted) {
+        String statement;
+
+        if(withDeleted) {
+            statement = "SELECT * FROM COMMENT_REGISTRY WHERE course_id = ? ORDER BY timestamp DESC";
+        } else {
+            statement = "SELECT * FROM COMMENT_REGISTRY WHERE course_id = ? AND deleted = false ORDER BY timestamp DESC ";
+        }
+
         return jdbcOperations.query(statement, new CommentExtractor(), courseID);
     }
 
     @Override
-    public List<Comment> queryCommentsByStudent(String username) {
-        final String statement = "SELECT * FROM COMMENT_REGISTRY WHERE user_id = ?";
+    public List<Comment> queryCommentsByUser(String username) {
+        final String statement = "SELECT * FROM COMMENT_REGISTRY WHERE user_id = ? ORDER BY timestamp DESC ";
         return jdbcOperations.query(statement, new CommentExtractor(), username);
     }
 
     @Override
     public String add(Comment comment) {
-        final String statement = "INSERT INTO COMMENT_REGISTRY VALUES (?, ?, ?, ?, ?, ?)";
+        final String statement = "INSERT INTO COMMENT_REGISTRY VALUES (?, ?, ?, ?, ?, ?, false)";
 
         jdbcOperations.update(new PreparedStatementCreator() {
             @Override
@@ -93,13 +107,8 @@ public class CommentRepositoryImpl implements CommentRepository {
     }
 
     @Override
-    public <T> String update(T fieldOld, T fieldNew, T key) {
-        return null;
-    }
-
-    @Override
     public <T> String delete(T key) {
-        final String statement = "DELETE FROM COMMENT_REGISTRY WHERE message_id = ?";
+        final String statement = "UPDATE COMMENT_REGISTRY SET deleted = true WHERE message_id = ?";
 
         jdbcOperations.update(new PreparedStatementCreator() {
             @Override

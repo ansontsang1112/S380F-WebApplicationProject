@@ -66,6 +66,7 @@ public class PollRepositoryImpl implements PollRepository{
                     pollResult.setPollID(resultSet.getString("poll_id"));
                     pollResult.setChoice(resultSet.getInt("choice"));
                     pollResult.setTimestamp(resultSet.getTimestamp("timestamp"));
+                    pollResult.setReplaced(resultSet.getBoolean("replaced"));
                     hashMap.put(id, pollResult);
                 }
             }
@@ -96,27 +97,65 @@ public class PollRepositoryImpl implements PollRepository{
 
     @Override
     @Transactional
-    public Map<String, Integer> queryPollCountByQuestion(String Question) {
-        return null;
+    public Map<String, Integer> queryPollCountByQuestion(String question) {
+        Map<String, Integer> resultSet = new HashMap<>();
+        int [] counter = new int[] {0,0,0,0};
+
+        final String requestPollStatement = "SELECT * FROM poll_registry WHERE question = ?";
+        Poll requestedPoll = jdbcOperations.query(requestPollStatement, new PollExtractor(), question).get(0);
+
+        final String requestPollResults = "SELECT * FROM poll_result_registry WHERE poll_id = ? AND replaced = false ";
+        List<PollResult> requestResults = jdbcOperations.query(requestPollResults, new PollResultExtractor(), requestedPoll.getUid());
+
+        for(PollResult pollResult : requestResults) {
+            switch (pollResult.getChoice()) {
+                case 1:
+                    counter[0] += 1;
+                    break;
+                case 2:
+                    counter[1] += 1;
+                    break;
+                case 3:
+                    counter[2] += 1;
+                    break;
+                case 4:
+                    counter[3] += 1;
+                    break;
+            }
+        }
+
+        resultSet.put("choice1", counter[0]);
+        resultSet.put("choice2", counter[1]);
+        resultSet.put("choice3", counter[2]);
+        resultSet.put("choice4", counter[3]);
+
+        return resultSet;
     }
 
     @Override
     @Transactional
-    public List<PollResult> queryPollResultByUser(String username) {
-        final String statement = "SELECT * FROM poll_result_registry WHERE user_id = ?";
-        return jdbcOperations.query(statement, new PollResultExtractor(), username);
+    public List<PollResult> queryPollResultByUser(String username, boolean replaced) {
+
+        String statement;
+        if(replaced) {
+            statement = "SELECT * FROM poll_result_registry WHERE user_id = ?";
+            return jdbcOperations.query(statement, new PollResultExtractor(), username);
+        } else {
+            statement = "SELECT * FROM poll_result_registry WHERE user_id = ? AND replaced = ? ";
+            return jdbcOperations.query(statement, new PollResultExtractor(), username, false);
+        }
     }
 
     @Override
     @Transactional
-    public List<PollResult> queryPollResultByPollID(String pollID) {
-        final String statement = "SELECT * FROM poll_result_registry WHERE poll_id = ?";
-        return jdbcOperations.query(statement, new PollResultExtractor(), pollID);
+    public List<PollResult> getPollResultByID(String uid) {
+        final String statement = "SELECT * FROM poll_result_registry WHERE uid = ?";
+        return jdbcOperations.query(statement, new PollResultExtractor(), uid);
     }
 
     @Override
     public Map<String, ?> isUserVoteQuestionBefore(String username, String id) {
-        final String statement = "SELECT * FROM poll_result_registry WHERE user_id = ? AND poll_id = ?";
+        final String statement = "SELECT * FROM poll_result_registry WHERE user_id = ? AND poll_id = ? AND replaced = false ";
         List<PollResult> resultSet = jdbcOperations.query(statement, new PollResultExtractor(), username, id);
 
         Map<String, ? super Object> resultMap = new HashMap<>();
@@ -126,6 +165,7 @@ public class PollRepositoryImpl implements PollRepository{
         } else {
             resultMap.put("result", "Y");
             resultMap.put("content", resultSet.get(0).getChoice());
+            resultMap.put("pollingUID", resultSet.get(0).getUid());
         }
 
         return resultMap;
@@ -148,8 +188,8 @@ public class PollRepositoryImpl implements PollRepository{
 
     @Override
     @Transactional
-    public <T, V, K> void addPollResult(T userID, V pollID, K choice) {
-        final String statement = "INSERT INTO poll_result_registry VALUES (?, ?, ?, ?, ?)";
+    public <T, V, K> void pollResultModifier(T userID, V pollID, K choice) {
+        final String statement = "INSERT INTO poll_result_registry VALUES (?, ?, ?, ?, ?, false )";
         jdbcOperations.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
@@ -165,19 +205,15 @@ public class PollRepositoryImpl implements PollRepository{
     }
 
     @Override
-    @Transactional
-    public <T, V, K> String updatePollResult(T index, V newValue, K key) {
-        final String statement = "UPDATE poll_result_registry SET " + index.toString() + "= ? WHERE uid = ?";
+    public <K> void replaceUpdater(K key) {
+        final String statement = "UPDATE poll_result_registry SET replaced = true WHERE uid = ?";
         jdbcOperations.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 PreparedStatement preparedStatement = con.prepareStatement(statement);
-                preparedStatement.setString(1, newValue.toString());
-                preparedStatement.setString(2, key.toString());
+                preparedStatement.setString(1, key.toString());
                 return preparedStatement;
             }
         });
-
-        return newValue.toString();
     }
 }

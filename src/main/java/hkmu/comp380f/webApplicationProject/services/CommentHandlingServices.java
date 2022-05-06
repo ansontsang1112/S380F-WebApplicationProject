@@ -17,19 +17,7 @@ public class CommentHandlingServices {
     public List<Comment> commentListHandler(User user) {
         List<Comment> comments;
 
-        // Get user role
-        String role = user.getRole();
-
-        switch (role) {
-            case "USER":
-                comments = commentRepository.queryCommentsByStudent(user.getUsername());
-                break;
-            case "LECTURER":
-                comments = commentRepository.queryAllComment();
-                break;
-            default:
-                comments = new ArrayList<>();
-        }
+        comments = commentRepository.queryCommentsByUser(user.getUsername());
 
         if(comments.isEmpty()) {
             comments = new ArrayList<>();

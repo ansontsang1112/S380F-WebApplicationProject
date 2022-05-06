@@ -19,11 +19,11 @@
 
     <style>
         .scroll {
-            max-height: 200px;
+            max-height: 250px;
             overflow-y: auto;
         }
     </style>
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="https://cdn.hypernology.com/bootstrap5.0/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
@@ -50,7 +50,7 @@
                         <a class="nav-link" href="/ocs/course">Course Page</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/ocs/comment">Comment Page</a>
+                        <a class="nav-link" href="/ocs/comment">History</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/ocs/poll">Polling Page</a>
@@ -80,7 +80,7 @@
                         <a class="nav-link" href="/ocs/course">Course Page</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/ocs/comment">Comment Page</a>
+                        <a class="nav-link" href="/ocs/comment">History</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/ocs/poll">Polling Page</a>
@@ -129,11 +129,31 @@
     <div class="row">
         <div class="col">
             <div class="card">
-                <div class="card-body">
+                <div class="card-body scroll" style="max-height: 350px">
                     <c:choose>
                         <c:when test="${courseRequestedByUser != null}">
-                            <p>Course Material(s)</p>
+                            <p>Course Material(s)<span align="right"></span></p>
                             <hr/>
+                            <c:if test="${courseFiles.size() != 0}">
+                                <table class="table">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Type</th>
+                                        <th scope="col">Upload At</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <c:forEach var="i" begin="1" end="${courseFiles.size()-1}">
+                                        <tr>
+                                            <td><a href="/ocs/download/${courseFiles.get(i).saveURL}">${courseFiles.get(i).saveURL}</a></td>
+                                            <td>${courseFiles.get(i).fileType.split("/")[1]}</td>
+                                            <td>${courseFiles.get(i).timestamp}</td>
+                                        </tr>
+                                    </c:forEach>
+                                    </tbody>
+                                </table>
+                            </c:if>
                         </c:when>
                         <c:otherwise>
                             <p style="color:dodgerblue"><strong>No Course Selected</strong></p>
@@ -159,7 +179,14 @@
                                                 ${courseComments.get(i).message}
                                             </div>
                                             <div class="card-footer text-muted">
-                                                <small>By ${courseComments.get(i).userID}, at ${courseComments.get(i).timestamp}</small>
+                                                <small>By ${courseComments.get(i).userID}, at ${courseComments.get(i).timestamp}</small><br>
+                                                <c:if test="${role != 'USER'}">
+                                                    <form:form action="/ocs/course">
+                                                        <input type="hidden" name="courseID" value="${courseRequestedByUser.courseID}">
+                                                        <input type="hidden" name="messageId" value="${courseComments.get(i).message_id}">
+                                                        <button type="submit" name="action" value="delete" class="btn btn-outline-danger">Remove this comment</button>
+                                                    </form:form>
+                                                </c:if>
                                             </div>
                                         </div>
                                         <br>
@@ -210,6 +237,54 @@
             </div>
         </div>
     </div>
+    <c:if test="${role != 'USER'}">
+        <hr/>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <c:if test="${param.OK}">
+                        <div class="alert alert-success" role="alert">
+                            ${param.OK}
+                        </div>
+                    </c:if>
+                    <c:if test="${param.error}">
+                        <div class="alert alert-danger" role="alert">
+                                ${param.error}
+                        </div>
+                    </c:if>
+                    <div class="card">
+                        <div class="card-body">
+                            <c:choose>
+                                <c:when test="${courseRequestedByUser != null}">
+                                    <p>You are uploading course material for ${param.courseSelected}</p>
+                                    <hr/>
+                                    <p>Uploading Course Material(s)</p>
+                                    <small>Select Multiple file at once if required.</small>
+                                    <form:form action="/ocs/upload" method="post" enctype="multipart/form-data">
+                                        <div class="mb-3">
+                                            <input type="file" id="materials" name="materials" multiple onchange="updateList()">
+                                        </div>
+
+                                        <p>Selected file(s):</p>
+                                        <div id="materialList"></div>
+
+                                        <input type="hidden" name="courseID" value="${param.courseSelected}"/>
+                                        <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                                        <button type="submit" name="action" value="upload" class="btn btn-primary">Upload</button>
+                                    </form:form>
+                                </c:when>
+                                <c:otherwise>
+                                    <p style="color:dodgerblue"><strong>No Course Selected</strong></p>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+    </c:if>
 </div>
 
 </body>
@@ -222,5 +297,15 @@
         .catch(error => {
             console.error(error);
         });
+
+    updateList = function() {
+        var input = document.getElementById('materials');
+        var output = document.getElementById('materialList');
+        var children = "";
+        for (var i = 0; i < input.files.length; ++i) {
+            children += '<li>' + input.files.item(i).name + '</li>';
+        }
+        output.innerHTML = '<ul>'+children+'</ul>';
+    }
 </script>
 </html>

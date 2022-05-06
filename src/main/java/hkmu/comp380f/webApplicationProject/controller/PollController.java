@@ -38,11 +38,13 @@ public class PollController {
 
         if(id.isPresent()) {
             Poll requestedPoll = pollRepository.queryPollByID(id.get()).get(0);
+            Map<String, Integer> questionResultCounter = pollRepository.queryPollCountByQuestion(requestedPoll.getQuestion());
 
             // Check if user vote before
             Map<String, ?> isUserVoteBefore = pollRepository.isUserVoteQuestionBefore(user.getUsername(), requestedPoll.getUid());
             if(isUserVoteBefore.get("result").toString() == "Y") {
                 modelMap.addAttribute("pollChooseBefore", pollServices.convertNumToChoice(Integer.parseInt(isUserVoteBefore.get("content").toString()), requestedPoll.getQuestion()));
+                modelMap.addAttribute("polledUID", isUserVoteBefore.get("pollingUID").toString());
             }
 
             List<String> pollChoices = pollServices.choiceList(requestedPoll);
@@ -50,6 +52,7 @@ public class PollController {
             modelMap.addAttribute("pollChoices", pollChoices);
             modelMap.addAttribute("requestedPoll", requestedPoll);
             modelMap.addAttribute("id", id.get());
+            modelMap.addAttribute("qrc", questionResultCounter);
         }
 
         modelMap.addAttribute("userObject", user);
@@ -62,13 +65,21 @@ public class PollController {
     public String pollEvent(Principal principal, ModelMap modelMap,
                             @RequestParam String id,
                             @RequestParam Integer choice,
-                            @RequestParam String isVoteBefore) {
-        if(isVoteBefore == "true") {
-            // Update statement
+                            @RequestParam boolean update,
+                            @RequestParam Optional<String> polledUID) {
 
+        if(update) {
+            // Update statement
+            if(polledUID.isPresent()) {
+                PollResult pollResult = pollRepository.getPollResultByID(polledUID.get()).get(0);
+                if(pollResult.getChoice() != choice) {
+                    pollRepository.replaceUpdater(polledUID.get());
+                    pollRepository.pollResultModifier(principal.getName(), id, choice);
+                }
+            }
         } else {
             // Add statement
-            pollRepository.addPollResult(principal.getName(), id, choice);
+            pollRepository.pollResultModifier(principal.getName(), id, choice);
         }
 
         // Query All Question(s)
@@ -80,6 +91,7 @@ public class PollController {
         modelMap.addAttribute("pollList", pollList);
         modelMap.addAttribute("role", user.getRole());
         modelMap.addAttribute("id", id);
+        modelMap.addAttribute("pollSelected", id);
 
         return "/common/poll";
     }

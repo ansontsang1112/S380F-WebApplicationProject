@@ -8,6 +8,15 @@ public class PollResult {
     private String pollID;
     private int choice;
     private Timestamp timestamp;
+    private boolean replaced;
+
+    public boolean isReplaced() {
+        return replaced;
+    }
+
+    public void setReplaced(boolean replaced) {
+        this.replaced = replaced;
+    }
 
     public PollResult() {}
 

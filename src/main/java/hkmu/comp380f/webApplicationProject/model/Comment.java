@@ -10,16 +10,25 @@ public class Comment {
     private String courseID;
     private Timestamp timestamp;
     private Timestamp lastEdit;
+    private boolean deleted;
 
     public Comment() {}
 
-    public Comment(String message_id, String userID, String message, String courseID, Timestamp timestamp, Timestamp lastEdit) {
+    public Comment(String message_id, String userID, String message, String courseID, Timestamp timestamp, Timestamp lastEdit, boolean deleted) {
         this.message_id = message_id;
         this.userID = userID;
         this.message = message;
         this.courseID = courseID;
         this.timestamp = timestamp;
         this.lastEdit = lastEdit;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     public Timestamp getLastEdit() {
