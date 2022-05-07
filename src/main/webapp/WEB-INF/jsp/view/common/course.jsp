@@ -141,6 +141,9 @@
                                         <th scope="col">#</th>
                                         <th scope="col">Type</th>
                                         <th scope="col">Upload At</th>
+                                        <c:if test="${role != 'USER'}">
+                                            <th scope="col">@</th>
+                                        </c:if>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -149,6 +152,9 @@
                                             <td><a href="/ocs/download/${courseFiles.get(i).saveURL}">${courseFiles.get(i).saveURL}</a></td>
                                             <td>${courseFiles.get(i).fileType.split("/")[1]}</td>
                                             <td>${courseFiles.get(i).timestamp}</td>
+                                            <c:if test="${role != 'USER'}">
+                                                <td><a href="/ocs/course?action=remove&fid=${courseFiles.get(i).uid}"><i class="fa fa-times" title="remove" style="color:red" aria-hidden="true"></i></a></td>
+                                            </c:if>
                                         </tr>
                                     </c:forEach>
                                     </tbody>

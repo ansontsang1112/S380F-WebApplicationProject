@@ -39,7 +39,9 @@ public class CourseController {
 
     @GetMapping("/course")
     public ModelAndView course(Principal principal, ModelMap modelMap,
-                               @RequestParam Optional<String> courseSelected) {
+                               @RequestParam Optional<String> courseSelected,
+                               @RequestParam Optional<String> action,
+                               @RequestParam Optional<String> fid) {
         ModelAndView modelAndView = new ModelAndView("/common/course");
         User user = userRepository.queryUser(principal.getName()).get(0);
 
@@ -58,6 +60,16 @@ public class CourseController {
             modelMap.addAttribute("commentsFromUser", commentsFromUser);
             modelAndView.addObject("courseRequestedByUser", course);
         }
+
+        if(action.isPresent()) {
+            switch (action.get()) {
+                case "remove":
+                    courseRepository.delFile(fid.get());
+                    break;
+            }
+        }
+
+
         return modelAndView;
     }
 

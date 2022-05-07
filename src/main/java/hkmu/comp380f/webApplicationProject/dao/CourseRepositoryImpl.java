@@ -126,7 +126,7 @@ public class CourseRepositoryImpl implements CourseRepository {
 
     @Override
     public <I> List<CourseFile> queryCourseFileByCourseID(I courseID) {
-        final String statement = "SELECT * FROM course_file_registry WHERE course_id = ?";
+        final String statement = "SELECT * FROM course_file_registry WHERE course_id = ? AND display = true";
         return jdbcOperations.query(statement, new CourseFileExtractor(), courseID);
     }
 
@@ -151,7 +151,16 @@ public class CourseRepositoryImpl implements CourseRepository {
 
     @Override
     public <I> void delFile(I fileID) {
+        final String statement = "UPDATE COURSE_FILE_REGISTRY SET display = false WHERE uid = ?";
 
+        jdbcOperations.update(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                PreparedStatement preparedStatement = con.prepareStatement(statement);
+                preparedStatement.setString(1, fileID.toString());
+                return preparedStatement;
+            }
+        });
     }
 
     @Override
