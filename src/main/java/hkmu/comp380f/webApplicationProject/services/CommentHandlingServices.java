@@ -14,10 +14,10 @@ public class CommentHandlingServices {
     @Resource
     public CommentRepository commentRepository;
 
-    public List<Comment> commentListHandler(User user) {
+    public List<Comment> commentListHandler(User user, String page) {
         List<Comment> comments;
 
-        comments = commentRepository.queryCommentsByUser(user.getUsername());
+        comments = commentRepository.queryCommentsByUser(user.getUsername(), page);
 
         if(comments.isEmpty()) {
             comments = new ArrayList<>();

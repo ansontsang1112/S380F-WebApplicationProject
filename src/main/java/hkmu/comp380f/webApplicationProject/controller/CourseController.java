@@ -35,6 +35,8 @@ public class CourseController {
     @Autowired
     private UserInformationServices userInformationServices;
 
+    private final String PAGE = "course";
+
     @GetMapping("/course")
     public ModelAndView course(Principal principal, ModelMap modelMap,
                                @RequestParam Optional<String> courseSelected) {
@@ -48,7 +50,7 @@ public class CourseController {
         if(courseSelected.isPresent()) {
             Course course = courseRepository.queryCoursesByCourseID(courseSelected.get()).get(0);
             List<Comment> commentListForCourse = (commentRepository.queryCommentsByCourseId(courseSelected.get(), false).isEmpty()) ? new ArrayList<>() : commentRepository.queryCommentsByCourseId(courseSelected.get(), false);
-            List<Comment> commentsFromUser = (commentRepository.queryCommentsByUser(principal.getName()).isEmpty() ? new ArrayList<>() : commentRepository.queryCommentsByUser(principal.getName()));
+            List<Comment> commentsFromUser = (commentRepository.queryCommentsByUser(principal.getName(), PAGE).isEmpty() ? new ArrayList<>() : commentRepository.queryCommentsByUser(principal.getName(), PAGE));
             List<CourseFile> filesByCourse = courseRepository.queryCourseFileByCourseID(courseSelected.get());
 
             modelMap.addAttribute("courseFiles", filesByCourse);
@@ -80,7 +82,7 @@ public class CourseController {
                             UUID messageID = UUID.randomUUID();
                             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
                             if (!message.isPresent()) throw new NullPointerException("Message is not present!");
-                            Comment comment = new Comment(messageID.toString(), user.getUsername(), message.get(), courseID.get(), timestamp, timestamp, false);
+                            Comment comment = new Comment(messageID.toString(), user.getUsername(), message.get(), courseID.get(), timestamp, timestamp, false, PAGE);
                             modelMap.addAttribute("OK", "Comment (" + commentRepository.add(comment) + ")" + action.get() + " successfully");
                             break;
 
@@ -96,7 +98,7 @@ public class CourseController {
 
             Course course = courseRepository.queryCoursesByCourseID(courseID.get()).get(0);
             List<Comment> commentListForCourse = (commentRepository.queryCommentsByCourseId(courseID.get(), false).isEmpty()) ? new ArrayList<>() : commentRepository.queryCommentsByCourseId(courseID.get(), false);
-            List<Comment> commentsFromUser = (commentRepository.queryCommentsByUser(principal.getName()).isEmpty() ? new ArrayList<>() : commentRepository.queryCommentsByUser(principal.getName()));
+            List<Comment> commentsFromUser = (commentRepository.queryCommentsByUser(principal.getName(), PAGE).isEmpty() ? new ArrayList<>() : commentRepository.queryCommentsByUser(principal.getName(), PAGE));
             List<CourseFile> filesByCourse = courseRepository.queryCourseFileByCourseID(courseID.get());
 
             modelMap.addAttribute("courseFiles", filesByCourse);

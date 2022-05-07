@@ -56,7 +56,7 @@ public class PollServices {
     }
 
     public String convertNumToChoice(int choice, String question) {
-        List<Poll> polls = pollRepository.queryAllPoll();
+        List<Poll> polls = pollRepository.queryAllPoll(false);
         
         for(Poll poll : polls) {
             if(question.equals(poll.getQuestion())) {

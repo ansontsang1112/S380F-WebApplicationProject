@@ -2,18 +2,20 @@ package hkmu.comp380f.webApplicationProject.controller;
 
 import hkmu.comp380f.webApplicationProject.component.DataTransformerComponent;
 import hkmu.comp380f.webApplicationProject.dao.CourseRepository;
+import hkmu.comp380f.webApplicationProject.dao.PollRepository;
 import hkmu.comp380f.webApplicationProject.dao.UserRepository;
 import hkmu.comp380f.webApplicationProject.model.Course;
+import hkmu.comp380f.webApplicationProject.model.Poll;
 import hkmu.comp380f.webApplicationProject.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import javax.swing.text.html.Option;
+import java.util.*;
 
 @Controller
 public class LecturerController {
@@ -36,6 +38,8 @@ public class LecturerController {
     private CourseRepository courseRepository;
     @Resource
     private UserRepository userRepository;
+    @Resource
+    private PollRepository pollRepository;
     @Autowired
     private DataTransformerComponent dataTransformerComponent;
 
@@ -44,6 +48,41 @@ public class LecturerController {
         List<Course> courseList = dataTransformerComponent.courseListModifier(courseRepository.queryAllCourses());
         modelMap.addAttribute("courseObject", courseList);
         modelMap.addAttribute("studentObject", userRepository.queryAllUsers());
+        modelMap.addAttribute("pollList", pollRepository.queryAllPoll(false));
+        modelMap.addAttribute("pollListFull", pollRepository.queryAllPoll(true));
+        return "/lecturer/index";
+    }
+
+    @PostMapping("/lecturer")
+    public String pollControlBasic(ModelMap modelMap,
+                                   @RequestParam Map<String, String> allParams,
+                                   @RequestParam Optional<String> action) {
+        if(action.isPresent()) {
+            switch (action.get()) {
+                case "new":
+                    Poll poll = new Poll(UUID.randomUUID().toString(),
+                            allParams.get("question"),
+                            allParams.get("choice1"),
+                            allParams.get("choice2"),
+                            allParams.get("choice3"),
+                            allParams.get("choice4"),
+                            allParams.get("pollID"),
+                            true);
+                    pollRepository.addPoll(poll);
+
+                    modelMap.addAttribute("OK", "Poll '" + allParams.get("question") + "' added successfully");
+                    break;
+                case "disable":
+                    String uid = allParams.get("pollID");
+                    modelMap.addAttribute("OK", "Poll '" + pollRepository.delPoll(uid) + "' deleted successfully");
+                    break;
+            }
+        }
+        List<Course> courseList = dataTransformerComponent.courseListModifier(courseRepository.queryAllCourses());
+        modelMap.addAttribute("courseObject", courseList);
+        modelMap.addAttribute("studentObject", userRepository.queryAllUsers());
+        modelMap.addAttribute("pollList", pollRepository.queryAllPoll(false));
+        modelMap.addAttribute("pollListFull", pollRepository.queryAllPoll(true));
         return "/lecturer/index";
     }
 

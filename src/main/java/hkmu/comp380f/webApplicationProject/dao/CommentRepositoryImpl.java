@@ -47,6 +47,7 @@ public class CommentRepositoryImpl implements CommentRepository {
                     comment.setTimestamp(resultSet.getTimestamp("timestamp"));
                     comment.setLastEdit(resultSet.getTimestamp("lastedit"));
                     comment.setDeleted(resultSet.getBoolean("deleted"));
+                    comment.setPage(resultSet.getString("page"));
                     hashMap.put(id, comment);
                 }
             }
@@ -55,15 +56,15 @@ public class CommentRepositoryImpl implements CommentRepository {
     }
 
     @Override
-    public List<Comment> queryAllComment(boolean withDeleted) {
+    public List<Comment> queryAllComment(boolean withDeleted, String page) {
         String statement;
         if(withDeleted) {
-            statement = "SELECT * FROM COMMENT_REGISTRY ORDER BY timestamp DESC";
+            statement = "SELECT * FROM COMMENT_REGISTRY WHERE page = ? ORDER BY timestamp DESC";
         } else {
-            statement = "SELECT * FROM COMMENT_REGISTRY WHERE deleted = false ORDER BY timestamp DESC ";
+            statement = "SELECT * FROM COMMENT_REGISTRY WHERE page = ? AND deleted = false ORDER BY timestamp DESC ";
         }
 
-        return jdbcOperations.query(statement, new CommentExtractor());
+        return jdbcOperations.query(statement, new CommentExtractor(), page);
     }
 
     @Override
@@ -71,23 +72,36 @@ public class CommentRepositoryImpl implements CommentRepository {
         String statement;
 
         if(withDeleted) {
-            statement = "SELECT * FROM COMMENT_REGISTRY WHERE course_id = ? ORDER BY timestamp DESC";
+            statement = "SELECT * FROM COMMENT_REGISTRY WHERE course_id = ? AND page = 'course' ORDER BY timestamp DESC";
         } else {
-            statement = "SELECT * FROM COMMENT_REGISTRY WHERE course_id = ? AND deleted = false ORDER BY timestamp DESC ";
+            statement = "SELECT * FROM COMMENT_REGISTRY WHERE course_id = ? AND deleted = false AND page = 'course' ORDER BY timestamp DESC ";
         }
 
         return jdbcOperations.query(statement, new CommentExtractor(), courseID);
     }
 
     @Override
-    public List<Comment> queryCommentsByUser(String username) {
-        final String statement = "SELECT * FROM COMMENT_REGISTRY WHERE user_id = ? ORDER BY timestamp DESC ";
-        return jdbcOperations.query(statement, new CommentExtractor(), username);
+    public List<Comment> queryCommentsByPollID(String uid, boolean withDeleted) {
+        String statement;
+
+        if(withDeleted) {
+            statement = "SELECT * FROM COMMENT_REGISTRY WHERE course_id = ? AND page = 'poll' ORDER BY timestamp DESC";
+        } else {
+            statement = "SELECT * FROM COMMENT_REGISTRY WHERE course_id = ? AND deleted = false AND page = 'poll' ORDER BY timestamp DESC ";
+        }
+
+        return jdbcOperations.query(statement, new CommentExtractor(), uid);
+    }
+
+    @Override
+    public List<Comment> queryCommentsByUser(String username, String page) {
+        final String statement = "SELECT * FROM COMMENT_REGISTRY WHERE user_id = ? AND page = ? ORDER BY timestamp DESC ";
+        return jdbcOperations.query(statement, new CommentExtractor(), username, page);
     }
 
     @Override
     public String add(Comment comment) {
-        final String statement = "INSERT INTO COMMENT_REGISTRY VALUES (?, ?, ?, ?, ?, ?, false)";
+        final String statement = "INSERT INTO COMMENT_REGISTRY VALUES (?, ?, ?, ?, ?, ?, false, ?)";
 
         jdbcOperations.update(new PreparedStatementCreator() {
             @Override
@@ -99,6 +113,7 @@ public class CommentRepositoryImpl implements CommentRepository {
                 preparedStatement.setString(4, comment.getCourseID());
                 preparedStatement.setTimestamp(5, comment.getTimestamp());
                 preparedStatement.setTimestamp(6, comment.getLastEdit());
+                preparedStatement.setString(7, comment.getPage());
                 return preparedStatement;
             }
         });

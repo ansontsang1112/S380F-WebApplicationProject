@@ -7,9 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 public interface PollRepository {
-    public List<Poll> queryAllPoll();
+    public List<Poll> queryAllPoll(boolean fullList);
     public List<Poll> queryPollByID(String uid);
-    public List<Poll> queryPollByUserID(String username);
 
     public Map<String, Integer> queryPollCountByQuestion(String Question);
     public List<PollResult> queryPollResultByUser(String username, boolean replaced);

@@ -8,8 +8,28 @@ public class Poll {
     private String choice3;
     private String choice4;
     private String pollID;
+    private boolean enable;
 
     public Poll() {}
+
+    public Poll(String uid, String question, String choice1, String choice2, String choice3, String choice4, String pollID, boolean enable) {
+        this.uid = uid;
+        this.question = question;
+        this.choice1 = choice1;
+        this.choice2 = choice2;
+        this.choice3 = choice3;
+        this.choice4 = choice4;
+        this.pollID = pollID;
+        this.enable = enable;
+    }
+
+    public boolean isEnable() {
+        return enable;
+    }
+
+    public void setEnable(boolean enable) {
+        this.enable = enable;
+    }
 
     public String getPollID() {
         return pollID;

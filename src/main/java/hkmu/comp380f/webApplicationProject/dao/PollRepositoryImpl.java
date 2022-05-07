@@ -42,6 +42,7 @@ public class PollRepositoryImpl implements PollRepository{
                     poll.setChoice3(resultSet.getString("choice_3"));
                     poll.setChoice4(resultSet.getString("choice_4"));
                     poll.setPollID(resultSet.getString("poll_id"));
+                    poll.setEnable(resultSet.getBoolean("enable"));
                     hashMap.put(id, poll);
                 }
             }
@@ -76,27 +77,22 @@ public class PollRepositoryImpl implements PollRepository{
     }
 
     @Override
-    @Transactional
-    public List<Poll> queryAllPoll() {
-        final String statement = "SELECT * FROM poll_registry";
+    @Transactional(readOnly = true)
+    public List<Poll> queryAllPoll(boolean fullList) {
+
+        final String statement = (fullList) ? "SELECT * FROM poll_registry" : "SELECT * FROM poll_registry WHERE enable = true";
         return jdbcOperations.query(statement, new PollExtractor());
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public List<Poll> queryPollByID(String uid) {
         final String statement = "SELECT * FROM poll_registry WHERE uid = ?";
         return jdbcOperations.query(statement, new PollExtractor(), uid);
     }
 
     @Override
-    @Transactional
-    public List<Poll> queryPollByUserID(String username) {
-        return null;
-    }
-
-    @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public Map<String, Integer> queryPollCountByQuestion(String question) {
         Map<String, Integer> resultSet = new HashMap<>();
         int [] counter = new int[] {0,0,0,0};
@@ -173,12 +169,37 @@ public class PollRepositoryImpl implements PollRepository{
 
     @Override
     public void addPoll(Poll poll) {
-
+        final String statement = "INSERT INTO poll_registry VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        jdbcOperations.update(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                PreparedStatement preparedStatement = con.prepareStatement(statement);
+                preparedStatement.setString(1, poll.getUid());
+                preparedStatement.setString(2, poll.getQuestion());
+                preparedStatement.setString(3, poll.getChoice1());
+                preparedStatement.setString(4, poll.getChoice2());
+                preparedStatement.setString(5, poll.getChoice3());
+                preparedStatement.setString(6, poll.getChoice4());
+                preparedStatement.setString(7, poll.getPollID());
+                preparedStatement.setBoolean(8, poll.isEnable());
+                return preparedStatement;
+            }
+        });
     }
 
     @Override
     public String delPoll(String str) {
-        return null;
+        final String statement = "UPDATE poll_registry SET enable = false WHERE uid = ?";
+        jdbcOperations.update(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                PreparedStatement preparedStatement = con.prepareStatement(statement);
+                preparedStatement.setString(1, str);
+                return preparedStatement;
+            }
+        });
+
+        return str;
     }
 
     @Override

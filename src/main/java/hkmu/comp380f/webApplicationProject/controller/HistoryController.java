@@ -20,6 +20,8 @@ import javax.annotation.Resource;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Controller
 public class HistoryController {
@@ -49,7 +51,10 @@ public class HistoryController {
         // Get User Role
         String role = user.getRole();
         // Get User history
-        List<Comment> comments = commentHandlingServices.commentListHandler(user);
+        List<Comment> courseComments = commentHandlingServices.commentListHandler(user, "course");
+        List<Comment> pollComments = commentHandlingServices.commentListHandler(user, "poll");
+
+        List<Comment> comments = Stream.concat(courseComments.stream(), pollComments.stream()).collect(Collectors.toList());
 
         List<PollResult> pollResults = pollRepository.queryPollResultByUser(user.getUsername(), true);
 

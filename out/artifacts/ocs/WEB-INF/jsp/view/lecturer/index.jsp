@@ -104,6 +104,101 @@
             </table>
         </div>
     </div>
+    <hr>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">General Poll Registry</h5>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">Poll ID</th>
+                    <th scope="col">Question</th>
+                    <th scope="col">Choices</th>
+                    <th scope="col">Status</th>
+                </tr>
+                </thead>
+                <tbody>
+                <c:forEach var="i" begin="0" end="${pollListFull.size()-1}">
+                    <tr>
+                        <td>${pollListFull.get(i).pollID}</td>
+                        <td>${pollListFull.get(i).question}</td>
+                        <td>${pollListFull.get(i).choice1} / ${pollListFull.get(i).choice2} / ${pollListFull.get(i).choice3} / ${pollListFull.get(i).choice4}</td>
+                        <td>${pollListFull.get(i).enable}</td>
+                    </tr>
+                </c:forEach>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <hr>
+    <div class="card">
+        <div class="card-body">
+            <c:if test="${OK}">
+                <div class="alert alert-success" role="alert">
+                    ${OK}
+                </div>
+            </c:if>
+            <h5 class="card-title">Poll Management</h5>
+            <div class="container">
+                <div class="row">
+                    <div class="col">
+                        New Poll
+                        <hr/>
+                        <form:form>
+                            <div class="mb-3">
+                                <label class="form-label">Name of the Poll</label>
+                                <input type="text" class="form-control" name="pollID">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Poll Question</label>
+                                <input type="text" class="form-control" name="question">
+                            </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <label class="form-label">Choice1</label>
+                                        <input type="text" class="form-control" name="choice1">
+                                    </div>
+                                    <div class="col">
+                                        <label class="form-label">Choice2</label>
+                                        <input type="text" class="form-control" name="choice2">
+                                    </div>
+                                    <div class="col">
+                                        <label class="form-label">Choice3</label>
+                                        <input type="text" class="form-control" name="choice3">
+                                    </div>
+                                    <div class="col">
+                                        <label class="form-label">Choice4</label>
+                                        <input type="text" class="form-control" name="choice4">
+                                    </div>
+                                </div>
+                            <br>
+                            <button type="submit" name="action" value="new" class="btn btn-primary">Submit</button>
+                        </form:form>
+                    </div>
+                    <div class="col">
+                        Disable Poll
+                        <hr/>
+                        <form:form>
+                            <div class="row g-3 align-items-center">
+                                <div class="col-auto">
+                                    <select class="form-select" name="pollID">
+                                        <c:forEach var="i" begin="0" end="${pollList.size()-1}">
+                                            <option value="${pollList.get(i).uid}">${pollList.get(i).pollID}</option>
+                                        </c:forEach>
+                                    </select>
+                                </div>
+                                <div class="col-auto">
+                                    <button type="submit" name="action" value="disable" class="btn btn-danger">Disable!</button>
+                                </div>
+                            </div>
+                            <br>
+
+                        </form:form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 </body>
 <script src="https://cdn.hypernology.com/bootstrap5.0/bootstrap.bundle.min.js"></script>

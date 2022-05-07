@@ -25,6 +25,7 @@
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="https://cdn.hypernology.com/bootstrap5.0/bootstrap.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/dropzone@6.0.0-beta.1/dist/dropzone.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 
@@ -261,7 +262,7 @@
                                     <hr/>
                                     <p>Uploading Course Material(s)</p>
                                     <small>Select Multiple file at once if required.</small>
-                                    <form:form action="/ocs/upload" method="post" enctype="multipart/form-data">
+                                    <form:form action="/ocs/upload" cssClass="dropzone" id="dropzonearea" method="post" enctype="multipart/form-data">
                                         <div class="mb-3">
                                             <input type="file" id="materials" name="materials" multiple onchange="updateList()">
                                         </div>
@@ -290,7 +291,7 @@
 </body>
 <script src="https://cdn.hypernology.com/bootstrap5.0/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.ckeditor.com/ckeditor5/31.0.0/classic/ckeditor.js"></script>
-
+<script src="https://unpkg.com/dropzone@6.0.0-beta.1/dist/dropzone-min.js"></script>
 <script>
     ClassicEditor
         .create(document.querySelector('#editor'))
@@ -307,5 +308,14 @@
         }
         output.innerHTML = '<ul>'+children+'</ul>';
     }
+</script>
+<script>
+    Dropzone.options.dropzonearea = {
+        paramName: "materials",
+        maxFilesize: 20,
+        accept: function(file, done) {
+            else { done(); }
+        }
+    };
 </script>
 </html>
